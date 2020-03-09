@@ -1,0 +1,213 @@
+
+https://vitux.com/install-and-deploy-kubernetes-on-ubuntu/
+
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
+
+
+kubeadm join 172.31.37.105:6443 --token wxrcr4.xmn3h6i5acm8dntu \
+    --discovery-token-ca-cert-hash sha256:1d8f4a8757588b2e3ac27bb3c7cc5deac232df71fc953671143fac969b611fce
+
+
+
+ apt update
+sudo apt install docker.io
+docker --version
+sudo systemctl enable docker
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+sudo apt install curl
+ sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+sudo apt install kubeadm
+ kubeadm version
+ sudo swapoff -a
+sudo hostnamectl set-hostname master-node
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+ mkdir -p $HOME/.kube
+ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+root@ip-172-31-37-105:~# kubectl get nodes
+master-node   NotReady   master   4m14s   v1.17.3
+
+sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+kubectl get pods --all-namespaces
+sudo kubectl get nodes
+
+master-node   Ready    master   6m22s   v1.17.3
+
+kubectl run --image=nginx nginx-app --port=80
+
+ kubectl get pods
+NAME                         READY   STATUS    RESTARTS   AGE
+nginx-app-69ff7df578-gsm4w   0/1     Pending   0          36s
+
+kubectl logs -f nginx-app-69ff7df578-gsm4w
+root@master-node:~# kubectl describe pods nginx-app-69ff7df578-gsm4w
+
+Events:
+  Type     Reason            Age                From               Message
+  ----     ------            ----               ----               -------
+  Warning  FailedScheduling  15s (x3 over 91s)  default-scheduler  0/1 nodes are available: 1 node(s) had taints that the pod didn't tolerate.
+
+kubectl taint nodes --all node-role.kubernetes.io/master-
+
+kubectl run --image=nginx nginx-app --port=80
+kubectl expose deployment nginx-app --port=80 --target-port=8000
+kubectl expose deployment nginx-app --type=NodePort --name=nginx-svc
+kubectl get pods
+NAME                         READY   STATUS    RESTARTS   AGE
+nginx-app-69ff7df578-gsm4w   1/1     Running   0          9m9s
+..................................
+
+root@master-node:~# history
+    1  cd
+    2  sudo apt install docker.io
+    3  cd
+    4  apt update
+    5  sudo apt install docker.io
+    6  docker --version
+    7  sudo systemctl enable docker
+    8  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+    9  sudo apt install curl
+   10  sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+   11  sudo apt install kubeadm
+   12  kubeadm version
+   13  sudo swapoff -a
+   14  sudo hostnamectl set-hostname master-node
+   15  sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+   16  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+   17  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+   18  kubectl get nodes
+   19  sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+   20  kubectl get pods --all-namespaces
+   21  sudo kubectl get nodes
+   22  kubectl run -t nginx:latest
+   23  kubectl taint nodes --all node-role.kubernetes.io/master-
+   24  kubectl run --image=nginx nginx-app --port=80
+   25  kubectl get pods
+   26  history
+   27  kubectl run --image=nginx nginx-app --port=80
+   28  kubectl get pods
+   29  kubectl logs -f nginx-app-69ff7df578-gsm4w
+   30  kubectl describe pods nginx-app-69ff7df578-gsm4w
+   31  ll
+   32  cd .kube/
+   33  ls
+   34  cat config
+   35  cd .kube/
+   36  cd
+   37  cd .kube/
+   38  cat config
+   39  cd
+   40  ll
+   41  cd .kube/
+   42  ls
+   43  scp config ubuntu@172.31.81.17:/home/ubuntu/jen
+   44  cd
+   45  kubectl get pods
+   46  kubectl get svc
+   47  kubectl delete pods nginx-app-69ff7df578-gsm4w
+   48  kubectl get pods
+   49  kubectl get deployments
+   50  kubectl delete deployments nginx-app
+   51  kubectl get deployments
+   52  kubectl get pods
+   53  kubectl get svc
+   54  kubectl delete svc kubernetes
+   55  kubectl get svc
+   56  kubectl run --image=nginx nginx-app --port=80
+   57  kubectl get pods
+   58  cd
+   59  kubectl get pods
+   60  kubectl logs -f nginx-app-69ff7df578-x59rl
+   61  kubectl logs nginx-app-69ff7df578-x59rl
+   62  kubectl describe pods nginx-app-69ff7df578-x59rl
+   63  kubectl get pods
+   64  kubectl exec -it nginx-app-69ff7df578-x59rl bash
+   65  kubectl get pods
+   66  kubectl delete pods nginx-app-69ff7df578-x59rl
+   67  kubectl get pods
+   68  kubectl get svc
+   69  cd
+   70  mkdir /home/ubuntu/jen
+   71  chmod 777 /home/ubuntu/jen
+   72  docker run -it -p 8081:8080 -p 50000:50000 -v /usr/bin/docker:/usr/bin/docker -v /home/ubuntu/jen:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/tmp:/var/lib/docker/tmp jenkins/jenkins
+   73  cd
+   74  kubectl get pods
+   75  docker ps
+   76  docker exec -it -u root 2549e32ea371 bash
+   77  java -version
+   78  apt install openjdk-8-jre-headless
+   79  java -version
+   80  docker exec -it 2549e32ea371 bash
+   81  kubectl get pods
+   82  chmod 777 /var/run/docker.sock
+   83  kubectl get deployments
+   84  kubectl --expose nginx-app
+   85  kubectl --help
+   86  kubectl get deployments
+   87  kubectl expose nginx-app
+   88  kubectl expose -h
+   89  kubectl expose deployment nginx-app --port=80 --target-port=8000
+   90  kubectl get svc
+   91  cd
+   92  kubectl get nodes
+   93  kubectl get pods
+   94  kubectl get svc
+   95  kubectl get pods
+   96  kubectl exec -it nginx-app-69ff7df578-swp2t bash
+   97  kubectl get svc
+   98  kubectl delete svc nginx-app
+   99  kubectl get svc
+  100  kubectl get pods
+  101  kubectl expose -h
+  102  kubectl expose deployment nginx-app --type=NodePort --name=nginx-svc
+  103  kubectl get svc
+  104  cd
+  105  kubectl get pods
+  106  kubectl describe pods kubernetes-7k507
+  107  kubectl delete pods kubernetes-7k507
+  108  kubectl get pods
+  109  kubectl describe pods kubernetes-qq8rc
+  110  kubectl get pods
+  111  kubectl describe pods kubernetes-t6x46
+  112  kubectl describe pods kubernetes-k12kb
+  113  kubectl delete pods kubernetes-k12kb kubernetes-t6x46
+  114  kubectl get pods
+  115  kubectl describe pods kubernetes-m33fn
+  116  kubectl get pods
+  117  cd
+  118  kubectl get svc
+  119  kubectl get pods
+  120  kubectl describe pods kubernetes-vjsz6
+  121  kubectl delete pods kubernetes-vjsz6
+  122  kubectl delete pods kubernetes-j4ds3
+  123  kubectl get pods
+  124  kubectl describe pods kubernetes-2qfr4
+  125  cd
+  126  kubectl get pods
+  127  cd
+  128  kubectl get pods
+  129  kubectl get svc
+  130  watch kubectl get pods
+  131  cd
+  132  kubectl get svc
+  133  kubectl get pods
+  134  kubectl get deployments
+  135  kubectl delete deployments tomcat-dep nginx-app
+  136  kubectl get svc
+  137  kubectl delete svc tomcat-svc nginx-svc
+  138  kubectl get pods
+  139  kubectl get svc
+  140  kubectl get deployments
+  141  cd
+  142  kubectl get pods
+  143  kubectl get svc
+  144  cd
+  145  kubectl get pods
+  146  cd
+  147  top
+  148  cd
+  149  ls
+  150  kubectl get deployments
+  151  kubectl get pods
+  152  history
+
